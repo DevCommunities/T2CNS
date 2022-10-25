@@ -58,7 +58,7 @@ async def update_task():
         isupdate, camp, changes = iscamp_update(test=True)
         if isupdate:
             # send update
-            embeds = interactions.Embed(title=f"ค่าย/งานแข่งใหม่ {changes} งาน", description=f"ระบบ Update กิจกรรมสายคอม T2CNS", color=0x00ff00)
+            embeds = interactions.Embed(title=f"ค่าย/งานแข่งใหม่ {changes} งาน", description=f"ระบบ Update กิจกรรมสายคอม T2CNS https://github.com/DevCommunities/T2CNS", color=0x00ff00)
             for i in range(changes):
                 embeds.add_field(name=camp[i]['title'], value=article_model(camp[i]), inline=False)
             await schedule.channel.send(embeds=embeds)
