@@ -7,7 +7,6 @@ dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
 # settup developement
-import discord
 import interactions # for slash commands
 from interactions.ext.tasks import IntervalTrigger, create_task 
 
@@ -15,11 +14,12 @@ bot = interactions.Client(token=os.environ.get("TOKEN"),default_scope=os.environ
 
 class Scheduler():
     def __init__(self):
-        self.ctx = None
+        self.channel = None
         self.isupdating = False
     
     def update(self, ctx):
-        self.ctx = ctx
+        # collect channel
+        self.channel = ctx.channel
 
 
 schedule = Scheduler()
@@ -39,11 +39,31 @@ async def schedule_update(ctx: interactions.CommandContext):
         await ctx.send(f"t2cns started with 30 min schedule feed update...")
         schedule.isupdating = True
 
-# create a task to update the channel every 10 seconds
+# setup camp filter
+from campfilter import iscamp_update
+
+# create a task to update the camps every 30 minutes
 @create_task(IntervalTrigger(10))
 async def update_task():
-    if schedule.isupdating and schedule.ctx is not None:
-        await schedule.ctx.send("Updating channel...")
+    def article_model(camp_data):
+        data = camp_data
+        return f"""
+        {data['link']}
+        {data['small_description']}
+        จัดโดย {data['organizer']}
+        ค่าใช้จ่าย {data['costs']}
+        """
+    if schedule.isupdating and schedule.channel is not None:
+        # get update
+        isupdate, camp, changes = iscamp_update(test=True)
+        if isupdate:
+            # send update
+            embeds = interactions.Embed(title=f"ค่าย/งานแข่งใหม่ {changes} งาน", description=f"ระบบ Update กิจกรรมสายคอม T2CNS", color=0x00ff00)
+            for i in range(changes):
+                embeds.add_field(name=camp[i]['title'], value=article_model(camp[i]), inline=False)
+            await schedule.channel.send(embeds=embeds)
+        else:
+            print('no update')
 
 # start the task
 update_task.start()

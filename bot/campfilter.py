@@ -6,13 +6,15 @@ def get_recent_camp():
     camp = camphub_parser('https://www.camphub.in.th/computer/')
     return camp.info
 
-def iscamp_update():
+def iscamp_update(test=False):
     camp = get_recent_camp()
     # if camp is the same as ./database/camp.json then return
     # else update ./database/camp.json (open in utf8)
 
-    # database = './database/test.json' # Use this for testing
-    database = './database/camp.json'
+    if test:
+        database = './database/dummy.json' # Use this for testing
+    else:
+        database = './database/camp.json'
    
     with open(join(dirname(__file__), database), 'r', encoding='utf8') as f:
         old_camp = json.load(f)
