@@ -1,6 +1,7 @@
 from camp_parser import camphub_parser
 import json
 from os.path import join, dirname
+import re
 
 def get_recent_camp():
     camp = camphub_parser('https://www.camphub.in.th/computer/')
@@ -35,5 +36,24 @@ def iscamp_update(test=False):
 
         return (True, camp, changes) # Change, camp, how much change(n camp)
 
+def recommend(camp):
+    blacklist = ['Change Education', 'BASIC HUB', 'MarianOnilne', 'Hamster Hub', 'นั่งเดฟไอทีแคมป์', 'Learning Code Camp', 'Seek Activity Co., Ltd.', 'Learning Code Station', 'Zero to Hero Activity', 'rhythm of arts creative learning centre', 'ONCEs Thailand', 'Lighthouse Workshop', 'JTCA Co., Ltd.', 'The Explorer', 'SPHERE (สะ-เฟียร์) : Area of Learning', 'ONCEs Thailand  วันซ์ ไทยแลนด์ : พื้นที่เรียนรู้สำหรับเยาวชนไทย']
+    def cost2num(x):
+        x = re.findall("[-+]?[.]?[\d]+(?:,\d\d\d)*[\.]?\d*(?:[eE][-+]?\d+)?", x) # return list (can return more than one number such as ['1,450', '1,250'])
+        x = [int(i.replace(',', '')) for i in x] # remove comma and convert to int
+        return x
 
+    # Reason empty by default
+    if camp['costs'] == 'ฟรี':
+        return True , ''
 
+    # check for bullshit organizer
+    elif camp['organizer'] in blacklist:
+        return False, ''
+    # overpriced
+    elif float(cost2num(camp['costs'])[0]) > 500:
+        return False, ''
+
+    else:
+        return None, ''
+    
