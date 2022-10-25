@@ -12,8 +12,8 @@ about the incoming events
 
 
 ### Function & Planing
-- [ ] notify about techcamp & competition in discord server
-- [ ] Ban system to exclude some event
+- [x] notify about techcamp & competition in discord server
+- [X] Ban system to exclude some event
 - [ ] Event Classifier to classify event
 - [ ] add more event source
 
