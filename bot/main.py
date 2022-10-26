@@ -10,7 +10,10 @@ load_dotenv(dotenv_path)
 import interactions # for slash commands
 from interactions.ext.tasks import IntervalTrigger, create_task 
 
-bot = interactions.Client(token=os.environ.get("TOKEN"),default_scope=os.environ.get("GUILD_ID_TEST"))
+try:
+    bot = interactions.Client(token=os.environ['TOKEN'],default_scope=os.environ["GUILD_ID_TEST"])
+except KeyError:
+    bot = interactions.Client(token=os.environ.get("TOKEN"),default_scope=os.environ.get("GUILD_ID_TEST"))
 
 class Scheduler():
     def __init__(self):
@@ -27,6 +30,7 @@ schedule = Scheduler()
 # server owner can set command permissions themself
 @bot.command(name="setup",description="Setup this channel for Default notification update")
 async def use_this_channel(ctx: interactions.CommandContext):
+    await ctx.get_channel()
     schedule.update(ctx)
     await ctx.send(f"Select this channel '{ctx.channel_id}' for notification updates!")
 
@@ -43,7 +47,7 @@ async def schedule_update(ctx: interactions.CommandContext):
 from campfilter import iscamp_update, recommend
 
 # create a task to update the camps every 30 minutes
-@create_task(IntervalTrigger(10))
+@create_task(IntervalTrigger(3600))
 async def update_task():
     def article_model(camp_data):
         data = camp_data
