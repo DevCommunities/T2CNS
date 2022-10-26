@@ -6,10 +6,9 @@ WORKDIR /usr/src/bot
 
 COPY ./bot .
 
-# add env file
-COPY ./bot/.env .env
-
 # install requirements
 RUN pip install -r requirements.txt
+# rm venv folder
+RUN rm -rf venv
 # Run the bot
 CMD [ "python3", "main.py" ]
